@@ -9,12 +9,13 @@
 #include <mutex>
 #include <condition_variable>
 
+#include <websocketpp/config/asio_no_tls.hpp>
+#include <websocketpp/server.hpp>
+
 namespace common
 {
-    enum class SaveImageOptions { PNG, JPEG, TIFF, DISABLED };
 
-    class HotkeyAction;
-    class ImagePipeline;
+    typedef websocketpp::server<websocketpp::config::asio> server;
 
     class GetFrameEngine
     {
@@ -28,14 +29,14 @@ namespace common
             void SetResizeOptions(ResizeOptions options);
             
             void Start();
-            void GetFrame();
             void Stop();
         
         private:
+            server server_;
+
+            void GetFrame(server* s, websocketpp::connection_hdl hdl, server::message_ptr msg);
 
             ResizeOptions resizeOptions;
-            
-            void ConstructWindows();
             
             std::vector<std::unique_ptr<ImagePipeline>> imagePipelines;
 

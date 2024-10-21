@@ -6,9 +6,6 @@
 
 #include <memory>
 
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
-
 int main() 
 {
     ICameraList cameras = sv::GetAllCameras();

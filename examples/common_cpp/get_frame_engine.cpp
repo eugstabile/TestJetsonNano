@@ -55,24 +55,23 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras)
  * because OpenCV functions manipulating GUI (imshow, waitKey) must be called from the main thread.
  * This may limit display fps when streaming from multiple sensors.
  */
-void GetFrameEngine::GetFrame()
+void GetFrameEngine::GetFrame(server* s, websocketpp::connection_hdl hdl, server::message_ptr msg)
 {  
-    for (auto &pipeline : imagePipelines) {
+    // for (auto &pipeline : imagePipelines) {
 
-        cv::UMat image = pipeline->GetImage();
-        cv::imshow(pipeline->GetName(), image);
+    auto pipeline = imagePipelines[0];
+
+    cv::UMat image = pipeline->GetImage();
+
+    std::vector<uchar> buf;
+    cv::imencode(".jpg", image, buf);
+
+    // Send the encoded image
+    s->send(hdl, buf.data(), buf.size(), websocketpp::frame::opcode::binary);
 
     pipeline->ReturnImage();
-    }
+    // }
 
-    cv::waitKey(1);
-}
-
-void GetFrameEngine::ConstructWindows()
-{
-    for (auto &pipeline : imagePipelines) {
-        cv::namedWindow(pipeline->GetName(), cv::WINDOW_OPENGL | cv::WINDOW_AUTOSIZE);
-    }
 }
 
 /**
@@ -93,7 +92,30 @@ void GetFrameEngine::Start()
         }
     );
 
-    ConstructWindows();
+    try {
+        // Set logging settings
+        server_.set_access_channels(websocketpp::log::alevel::all);
+        server_.clear_access_channels(websocketpp::log::alevel::frame_payload);
+
+        // Initialize Asio
+        server_.init_asio();
+
+        // Register our message handler
+        server_.set_message_handler(bind(&WebSocketServer::GetFrame, this, ::_1, ::_2));
+
+        // Listen on port 9002
+        server_.listen(9002);
+
+        // Start the server accept loop
+        server_.start_accept();
+
+        // Start the ASIO io_service run loop
+        server_.run();
+    } catch (websocketpp::exception const & e) {
+        std::cout << e.what() << std::endl;
+    } catch (...) {
+        std::cout << "other exception" << std::endl;
+    }
 }
 
 /**
@@ -113,5 +135,8 @@ void GetFrameEngine::Stop()
             if (pipeline->IsMaster()) pipeline->Stop(); 
         }
     );
+
+    server_.stop_listening();
+    server_.stop();
 }
 }
