@@ -22,12 +22,6 @@ int main()
     
     frameEngine.Start();
 
-    while (true) {
-        frameEngine.GetFrame();  
-    }
-    
-    frameEngine.Stop();  
-
     return 0;
 }
 
