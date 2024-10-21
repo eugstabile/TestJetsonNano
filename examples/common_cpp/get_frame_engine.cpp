@@ -58,15 +58,14 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras)
 void GetFrameEngine::GetFrame()
 {  
     for (auto &pipeline : imagePipelines) {
-    
+
         cv::UMat image = pipeline->GetImage();
         cv::imshow(pipeline->GetName(), image);
 
-        pipeline->ReturnImage();
+    pipeline->ReturnImage();
     }
 
-    cv::waitKey(0);
-    cv::destroyAllWindows();
+    cv::waitKey(1);
 }
 
 void GetFrameEngine::ConstructWindows()
