@@ -67,7 +67,7 @@ void GetFrameEngine::GetFrame()
 
 }
 
-void DisplayEngine::ConstructWindows()
+void GetFrameEngine::ConstructWindows()
 {
     for (auto &pipeline : imagePipelines) {
         cv::namedWindow(pipeline->GetName(), cv::WINDOW_OPENGL | cv::WINDOW_AUTOSIZE);
