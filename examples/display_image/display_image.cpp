@@ -21,11 +21,8 @@ int main()
     common::GetFrameEngine frameEngine(configuredCameras);
     
     frameEngine.Start();
-    frameEngine.GetFrame();
-
-    while (true)
-    {
-    }    
+    frameEngine.GetFrame();  
+    frameEngine.Stop();  
 
     return 0;
 }

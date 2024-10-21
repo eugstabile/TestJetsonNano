@@ -65,6 +65,8 @@ void GetFrameEngine::GetFrame()
         pipeline->ReturnImage();
     }
 
+    cv::waitKey(0);
+    cv::destroyAllWindows();
 }
 
 void GetFrameEngine::ConstructWindows()
