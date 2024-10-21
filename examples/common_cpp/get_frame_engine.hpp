@@ -35,6 +35,8 @@ namespace common
 
             ResizeOptions resizeOptions;
             
+            void ConstructWindows();
+            
             std::vector<std::unique_ptr<ImagePipeline>> imagePipelines;
 
             void Construct(const ConfiguredCameras &cameras);

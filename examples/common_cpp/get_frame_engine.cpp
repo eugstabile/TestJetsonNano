@@ -67,6 +67,13 @@ void GetFrameEngine::GetFrame()
 
 }
 
+void DisplayEngine::ConstructWindows()
+{
+    for (auto &pipeline : imagePipelines) {
+        cv::namedWindow(pipeline->GetName(), cv::WINDOW_OPENGL | cv::WINDOW_AUTOSIZE);
+    }
+}
+
 /**
  * Sensors in master mode have to be started before sensors in slave mode that they control.
  * Application may hang otherwise.
@@ -84,6 +91,8 @@ void GetFrameEngine::Start()
             if (!pipeline->IsMaster()) pipeline->Start();
         }
     );
+
+    ConstructWindows();
 }
 
 /**
