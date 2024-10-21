@@ -18,7 +18,7 @@ int main()
 
     common::ConfiguredCameras configuredCameras = common::CameraConfigurator(selected).Configure();
 
-    common::GetFrameEngine frameEngine(configuredCameras)
+    common::GetFrameEngine frameEngine(configuredCameras);
     
     frameEngine.Start();
     frameEngine.GetFrame();

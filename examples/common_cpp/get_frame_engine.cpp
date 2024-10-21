@@ -55,7 +55,7 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras)
  * because OpenCV functions manipulating GUI (imshow, waitKey) must be called from the main thread.
  * This may limit display fps when streaming from multiple sensors.
  */
-cv::UMat GetFrameEngine::GetImage()
+void GetFrameEngine::GetFrame()
 {  
     for (auto &pipeline : imagePipelines) {
     
@@ -64,6 +64,7 @@ cv::UMat GetFrameEngine::GetImage()
 
         pipeline->ReturnImage();
     }
+
 }
 
 /**

@@ -28,7 +28,7 @@ namespace common
             void SetResizeOptions(ResizeOptions options);
             
             void Start();
-            cv::UMat GetFrame();
+            void GetFrame();
             void Stop();
         
         private:
