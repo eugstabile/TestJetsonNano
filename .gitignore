@@ -1,4 +1,4 @@
-bin
-.vscode
-argus
-opencv
+/bin
+/.vscode
+/argus
+/opencv
