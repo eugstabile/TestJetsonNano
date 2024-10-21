@@ -14,11 +14,11 @@
 
 namespace common
 {
-
     typedef websocketpp::server<websocketpp::config::asio> server;
+    class ImagePipeline;
 
     class GetFrameEngine
-    {
+    {        
         public:
             GetFrameEngine(const ConfiguredCameras &cameras);
             GetFrameEngine(const ConfiguredCamera &camera);

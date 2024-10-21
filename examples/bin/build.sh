@@ -28,4 +28,6 @@ cd ../build
 
 echo Building display_image cpp example...
 $CPP_COMPILER ../../examples/display_image/display_image.cpp ../../examples/common_cpp/*.cpp -o display_image $CPP_FLAGS $OPENCV_FLAGS $INCLUDE $LINK
-$CPP_COMPILER ../../examples/recive_image/display_image.cpp ../../examples/common_cpp/*.cpp -o recive_image $CPP_FLAGS $OPENCV_FLAGS $INCLUDE $LINK
+
+echo Building recive_image cpp example...
+$CPP_COMPILER ../../examples/recive_image/recive_image.cpp ../../examples/common_cpp/*.cpp -o recive_image $CPP_FLAGS $OPENCV_FLAGS $INCLUDE $LINK
