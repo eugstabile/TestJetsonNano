@@ -22,12 +22,14 @@ public:
 
             // Register our message handler
             client_.set_message_handler(bind(&WebSocketClient::on_message, this, &client_, ::_1, ::_2));
+            client_.set_open_handler(bind(&WebSocketClient::on_open, this, &client_, ::_1));
         } catch (websocketpp::exception const & e) {
             std::cout << e.what() << std::endl;
         }
     }
 
     void run() {
+
         websocketpp::lib::error_code ec;
         client::connection_ptr con = client_.get_connection(uri_, ec);
         if (ec) {
@@ -35,16 +37,12 @@ public:
             return;
         }
 
-
-        // Note that connect here only requests a connection. No network messages are
-        // exchanged until the event loop starts running in the next line.
         client_.connect(con);
         connection_hdl_ = con->get_handle();
 
-        // Start the ASIO io_service run loop
-        // this will cause a single connection to be made to the server. c.run()
-        // will exit when this connection is closed.
+        cv::namedWindow("Received Image", cv::WINDOW_AUTOSIZE);
         client_.run();
+
     }
 
     void stop() {
@@ -53,8 +51,16 @@ public:
     }
     
     void send() {
-        std::string mensaje = "WEBOclient";
-        client_.send(connection_hdl_, mensaje, websocketpp::frame::opcode::text);
+
+        std::string mensaje = "grabFrame";
+        websocketpp::lib::error_code ec;
+        client_.send(connection_hdl_, mensaje, websocketpp::frame::opcode::text, ec);
+
+        if (ec) {
+
+            std::cout << "Echo failed because: " << ec.message() << std:: endl;
+
+        }
         
     }
 
@@ -66,17 +72,33 @@ private:
 
     void on_message(client* c, websocketpp::connection_hdl hdl, client::message_ptr msg) {
         // Decode the received image
-        std::vector<uchar> buf(msg->get_payload().begin(), msg->get_payload().end());
-        cv::UMat image = cv::imdecode(buf, cv::IMREAD_COLOR).getUMat(cv::ACCESS_READ);
+        
+        const std::string &data = msg->get_payload();
 
-        // Display the image
-        cv::imshow("Received Image", image);
-        cv::waitKey(1);
+        std::vector<uchar> buf(data.begin(), data.end());
+
+        std::cout << "El size es: " << buf.size() << std::endl;
+
+        cv::Mat image = cv::imdecode(buf, cv::IMREAD_GRAYSCALE);
+
+        if (image.empty()) {
+            std::cout << "Recibiste un error" << std::endl;
+        } else {
+            // Display the image
+            cv::imshow("Received Image", image);
+            cv::waitKey(1);
+        }
 
         send();
 
     }
     
+    void on_open(client* c, websocketpp::connection_hdl hdl) {
+
+        std::cout << "on_open " << std::endl;
+        send();
+    }
+
 };
 
 int main() {
@@ -84,11 +106,6 @@ int main() {
     std::thread client_thread([&client]()
      {
         client.run();
-        client.send();
-        client.send();
-        client.send();
-        client.send();
-        client.send();
     });
 
     // Simulate some work

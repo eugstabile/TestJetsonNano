@@ -26,12 +26,12 @@ namespace common
             return;
         }
 
-        std::cout << "Choose a pixel format [0]\n";
+        // std::cout << "Choose a pixel format [0]\n";
         for (const MenuEntry& entry : menu) {
             std::cout << entry.index  << " - " << entry.name << std::endl;
         }
 
-        int32_t index = QueryNumber(0, menu.size() - 1, 0);
+        int32_t index = 0; //QueryNumber(0, menu.size() - 1, 0);
         control->Set(index);
 
         if (control->Get() != index) {
@@ -49,12 +49,12 @@ namespace common
             return;
         }
 
-        std::cout << "Choose a frame size [0]\n";
+        //std::cout << "Choose a frame size [0]\n";
         for (const MenuEntry& entry : menufrmsiz) {
             std::cout << entry.index  << " - " << entry.name << std::endl;
         }
 
-        int32_t index = QueryNumber(0, menufrmsiz.size() - 1, 0);
+        int32_t index = 0; //QueryNumber(0, menufrmsiz.size() - 1, 0);
         frmsizControl->Set(index);
 
         if (frmsizControl->Get() != index) {
@@ -66,14 +66,14 @@ namespace common
 
     ICamera* SelectCamera(const ICameraList& cameras)
     {
-        std::cout << "Choose a camera [0]\n";
+        //std::cout << "Choose a camera [0]\n";
         int i = 0;
         for (ICamera *camera : cameras) {
             std::cout << i << " - " << camera->GetName() << " (" << camera->GetDriverName() << ")" << std::endl;
             i += 1;
         }
 
-        int32_t index = QueryNumber(0, cameras.size() - 1, 0);
+        int32_t index = 0; //QueryNumber(0, cameras.size() - 1, 0);
 
         return cameras[index];
     }
@@ -104,11 +104,11 @@ namespace common
 
     int32_t SelectFromMenu(std::string name, std::vector<std::string> menu, uint32_t defaultIndex = 0)
     {
-        std::cout << "Select " << name << " [" << defaultIndex << "]" << std::endl;
+        //std::cout << "Select " << name << " [" << defaultIndex << "]" << std::endl;
         
-        for (uint32_t i = 0; i < menu.size(); ++i) {
-            std::cout << i << " - " << menu[i] << std::endl;
-        }
+        // for (uint32_t i = 0; i < menu.size(); ++i) {
+        //     std::cout << i << " - " << menu[i] << std::endl;
+        // }
 
         return QueryNumber(0, menu.size() - 1, defaultIndex);
     }

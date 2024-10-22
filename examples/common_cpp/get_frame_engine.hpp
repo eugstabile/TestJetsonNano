@@ -34,7 +34,7 @@ namespace common
         private:
             server server_;
 
-            void GetFrame(server* s, websocketpp::connection_hdl hdl, server::message_ptr msg);
+            void GetFrame(websocketpp::connection_hdl hdl, server::message_ptr msg);
 
             ResizeOptions resizeOptions;
             

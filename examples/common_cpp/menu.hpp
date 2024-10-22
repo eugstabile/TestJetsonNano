@@ -73,21 +73,21 @@ namespace common
     {
         ClearTerminal();
 
-        std::cout << prompt << " [" << exitMenuKey << "]:" << std::endl;
+        //std::cout << prompt << " [" << exitMenuKey << "]:" << std::endl;
 
-        for (uint32_t i = 0; i < menu.size(); ++i) {
-            std::cout << i << " - " << menu[i].GetDescription() << std::endl;
-        }
+        //for (uint32_t i = 0; i < menu.size(); ++i) {
+            //std::cout << i << " - " << menu[i].GetDescription() << std::endl;
+        //}
 
         while (true) {
             int32_t index;
             switch (SelectValue(0, menu.size() - 1, index)) {
             case Selection::Selected:
                 selected = menu[index].GetValue();
-                std::cout << std::endl;
+                //std::cout << std::endl;
                 return true;
             case Selection::Exit:
-                std::cout << std::endl;
+                //std::cout << std::endl;
                 return false;
             case Selection::Repeat:
                 break;

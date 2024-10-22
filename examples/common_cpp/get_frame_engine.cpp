@@ -60,24 +60,27 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras)
  * because OpenCV functions manipulating GUI (imshow, waitKey) must be called from the main thread.
  * This may limit display fps when streaming from multiple sensors.
  */
-void GetFrameEngine::GetFrame(server* s, websocketpp::connection_hdl hdl, server::message_ptr msg)
+void GetFrameEngine::GetFrame(websocketpp::connection_hdl hdl, server::message_ptr msg)
 {  
-    // for (auto &pipeline : imagePipelines) {
     std::cout << msg->get_payload() << std::endl;
-    std::cout << "hola" << std::endl;
 
     auto&& pipeline = imagePipelines.front();
 
     cv::UMat image = pipeline->GetImage();
 
     std::vector<uchar> buf;
-    cv::imencode(".jpg", image, buf);
-    std::cout << "envio" << std::endl;
-    // Send the encoded image
-    s->send(hdl, buf.data(), buf.size(), websocketpp::frame::opcode::binary);
-    std::cout << "termine" << std::endl;
-    pipeline->ReturnImage();
-    // }
+    
+    bool pass = cv::imencode(".png", image.getMat(cv::AccessFlag::ACCESS_READ), buf);
+
+    if (pass) {
+
+        // Send the encoded image
+        server_.send(hdl, buf.data(), buf.size(), websocketpp::frame::opcode::binary);
+        pipeline->ReturnImage();
+
+    } else {
+        std::cout << "Fail encode" << std::endl;
+    }
 
 }
 
@@ -100,24 +103,20 @@ void GetFrameEngine::Start()
     );
 
     try {
-        // Set logging settings
+
         server_.set_access_channels(websocketpp::log::alevel::all);
         server_.clear_access_channels(websocketpp::log::alevel::frame_payload);
 
-        // Initialize Asio
         server_.init_asio();
 
-        // Register our message handler
-        server_.set_message_handler(bind(&GetFrameEngine::GetFrame, this, &server_, ::_1, ::_2));
-
-        // Listen on port 9002
+        server_.set_message_handler([this](websocketpp::connection_hdl hdl, server::message_ptr msg) {
+            this->GetFrame(hdl, msg);
+        });
+            
         server_.listen(9002);
-
-        // Start the server accept loop
         server_.start_accept();
-
-        // Start the ASIO io_service run loop
         server_.run();
+        
     } catch (websocketpp::exception const & e) {
         std::cout << e.what() << std::endl;
     } catch (...) {
