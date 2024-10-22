@@ -4,6 +4,10 @@
 #include <iostream>
 #include <vector>
 
+using websocketpp::lib::placeholders::_1;
+using websocketpp::lib::placeholders::_2;
+using websocketpp::lib::bind;
+
 class WebSocketClient {
 public:
     WebSocketClient(const std::string& uri) : uri_(uri) {
@@ -17,7 +21,7 @@ public:
             client_.init_asio();
 
             // Register our message handler
-            client_.set_message_handler(bind(&WebSocketClient::on_message, this, ::_1, ::_2));
+            client_.set_message_handler(bind(&WebSocketClient::on_message, this, &client_, ::_1, ::_2));
         } catch (websocketpp::exception const & e) {
             std::cout << e.what() << std::endl;
         }
@@ -25,17 +29,17 @@ public:
 
     void run() {
         websocketpp::lib::error_code ec;
-        client::connection_ptr con = c.get_connection(uri_, ec);
+        client::connection_ptr con = client_.get_connection(uri_, ec);
         if (ec) {
             std::cout << "could not create connection because: " << ec.message() << std::endl;
-            return 0;
+            return;
         }
 
-        connection_hdl_ = con->get_handle();
 
         // Note that connect here only requests a connection. No network messages are
         // exchanged until the event loop starts running in the next line.
         client_.connect(con);
+        connection_hdl_ = con->get_handle();
 
         // Start the ASIO io_service run loop
         // this will cause a single connection to be made to the server. c.run()
@@ -46,6 +50,12 @@ public:
     void stop() {
         client_.close(connection_hdl_, websocketpp::close::status::going_away, "Client shutting down");
         client_.stop();
+    }
+    
+    void send() {
+        std::string mensaje = "WEBOclient";
+        client_.send(connection_hdl_, mensaje, websocketpp::frame::opcode::text);
+        
     }
 
 private:
@@ -62,13 +72,23 @@ private:
         // Display the image
         cv::imshow("Received Image", image);
         cv::waitKey(1);
+
+        send();
+
     }
+    
 };
 
 int main() {
     WebSocketClient client("ws://localhost:9002");
-    std::thread client_thread(&client {
+    std::thread client_thread([&client]()
+     {
         client.run();
+        client.send();
+        client.send();
+        client.send();
+        client.send();
+        client.send();
     });
 
     // Simulate some work

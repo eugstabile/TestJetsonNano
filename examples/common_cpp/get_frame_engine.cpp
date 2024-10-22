@@ -10,12 +10,13 @@
 
 #include <opencv2/highgui.hpp>
 
-namespace common
-{
-
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
+
+namespace common
+{
+
 
 GetFrameEngine::GetFrameEngine(const ConfiguredCameras &cameras)
 {
@@ -62,17 +63,19 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras)
 void GetFrameEngine::GetFrame(server* s, websocketpp::connection_hdl hdl, server::message_ptr msg)
 {  
     // for (auto &pipeline : imagePipelines) {
+    std::cout << msg->get_payload() << std::endl;
+    std::cout << "hola" << std::endl;
 
-    auto pipeline = imagePipelines[0];
+    auto&& pipeline = imagePipelines.front();
 
     cv::UMat image = pipeline->GetImage();
 
     std::vector<uchar> buf;
     cv::imencode(".jpg", image, buf);
-
+    std::cout << "envio" << std::endl;
     // Send the encoded image
     s->send(hdl, buf.data(), buf.size(), websocketpp::frame::opcode::binary);
-
+    std::cout << "termine" << std::endl;
     pipeline->ReturnImage();
     // }
 
@@ -105,7 +108,7 @@ void GetFrameEngine::Start()
         server_.init_asio();
 
         // Register our message handler
-        server_.set_message_handler(bind(&WebSocketServer::GetFrame, this, ::_1, ::_2));
+        server_.set_message_handler(bind(&GetFrameEngine::GetFrame, this, &server_, ::_1, ::_2));
 
         // Listen on port 9002
         server_.listen(9002);
