@@ -12,9 +12,5 @@ add_library(${LIBRARY_NAME} STATIC
     "string_util.cpp"
 )
 
-target_include_directories(${LIBRARY_NAME} PUBLIC
-    ${CMAKE_SOURCE_DIR}/websocketpp
-)
-
 
 target_link_libraries(${LIBRARY_NAME} PUBLIC ${OpenCV_LIBRARIES} ${Boost_LIBRARIES})
