@@ -1,5 +1,3 @@
 /bin
 /.vscode
-/argus
-/opencv
-/examples/build
+/build
