@@ -1,2 +1,1 @@
 add_subdirectory(common_cpp)
-add_subdirectory(websocketpp)

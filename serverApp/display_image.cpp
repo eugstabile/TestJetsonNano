@@ -1,8 +1,8 @@
 #include "sv/sv.h"
 
-#include "common_cpp/common.hpp"
-#include "common_cpp/get_frame_engine.hpp"
-#include "common_cpp/camera_configurator.hpp"
+#include "common.hpp"
+#include "get_frame_engine.hpp"
+#include "camera_configurator.hpp"
 
 #include <memory>
 
