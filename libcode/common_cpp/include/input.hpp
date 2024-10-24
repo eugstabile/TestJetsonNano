@@ -12,36 +12,37 @@ int32_t QueryNumber(int32_t minInclusive, int32_t maxInclusive, int32_t defaultV
     int32_t selectedNumber = defaultValue;
     bool validNumber = false;
     do {
-        std::cout << ">";
+        // std::cout << ">";
 
-        std::string selection;
-        std::getline(std::cin, selection);
+        // std::string selection;
+        // std::getline(std::cin, selection);
 
-        if (selection == "") {
-            return defaultValue;
-        }
+        // if (selection == "") {
+        //     return defaultValue;
+        // }
+        return defaultValue;
 
-        validNumber = true;
-        try {
-            selectedNumber = std::stoi(selection);
-            if (clamp) {
-                if (selectedNumber < minInclusive) {
-                    std::cout << "Clamping to minimum!" << std::endl;
-                    selectedNumber = minInclusive;
-                }
-                else if (selectedNumber > maxInclusive) {
-                    std::cout << "Clamping to maximum!" << std::endl;
-                    selectedNumber = maxInclusive;
-                }
-            }
-            else if (selectedNumber < minInclusive || selectedNumber > maxInclusive) {
-                std::cout << "Number out of bounds!" << std::endl;
-                validNumber = false;
-            }
-        } catch (...) {
-            std::cout << "Invalid number!" << std::endl;
-            validNumber = false;
-        }
+        // validNumber = true;
+        // try {
+        //     selectedNumber = std::stoi(selection);
+        //     if (clamp) {
+        //         if (selectedNumber < minInclusive) {
+        //             std::cout << "Clamping to minimum!" << std::endl;
+        //             selectedNumber = minInclusive;
+        //         }
+        //         else if (selectedNumber > maxInclusive) {
+        //             std::cout << "Clamping to maximum!" << std::endl;
+        //             selectedNumber = maxInclusive;
+        //         }
+        //     }
+        //     else if (selectedNumber < minInclusive || selectedNumber > maxInclusive) {
+        //         std::cout << "Number out of bounds!" << std::endl;
+        //         validNumber = false;
+        //     }
+        // } catch (...) {
+        //     std::cout << "Invalid number!" << std::endl;
+        //     validNumber = false;
+        // }
 
     } while(selectedNumber < minInclusive || selectedNumber > maxInclusive || !validNumber);
 
