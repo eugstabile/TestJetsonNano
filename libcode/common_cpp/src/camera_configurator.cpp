@@ -26,7 +26,7 @@ ConfiguredCameras CameraConfigurator::Configure()
     ConfiguredCameras configuredCameras;
 
     std::transform(cameras.begin(), cameras.end(), std::back_inserter(configuredCameras),
-        [](ICamera *camera) { return ConfiguredCamera {camera, false, { true, VgaFrameSize().GetWidth(), VgaFrameSize().GetHeight() }}; }
+        [](ICamera *camera) { return ConfiguredCamera {camera, false, { true, WholeFrameSize().GetWidth(), WholeFrameSize().GetHeight() }}; }
     );
 
     int32_t index;
@@ -43,6 +43,8 @@ void CameraConfigurator::ConfigureControls(ConfiguredCamera &configuredCamera)
     FrameSize configuredResize(configuredCamera.resizeOptions.width, configuredCamera.resizeOptions.height);
     if (configuredCamera.resizeOptions.enable == false)
         resizeControl.Set(ResizeValue::None);
+    else if (configuredResize == WholeFrameSize())
+        resizeControl.Set(ResizeValue::Whole);
     else if (configuredResize == FullHdFrameSize())
         resizeControl.Set(ResizeValue::FullHd);
     else if (configuredResize == HdFrameSize())
@@ -62,6 +64,11 @@ void CameraConfigurator::ConfigureControls(ConfiguredCamera &configuredCamera)
         configuredCamera.resizeOptions.enable = false;
         configuredCamera.resizeOptions.width = 0;
         configuredCamera.resizeOptions.height = 0;
+        break;
+    case ResizeValue::Whole:
+        configuredCamera.resizeOptions.enable = true;
+        configuredCamera.resizeOptions.width = WholeFrameSize().GetWidth();
+        configuredCamera.resizeOptions.height = WholeFrameSize().GetHeight();
         break;
     case ResizeValue::FullHd:
         configuredCamera.resizeOptions.enable = true;

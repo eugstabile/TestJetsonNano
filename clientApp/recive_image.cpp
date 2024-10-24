@@ -106,7 +106,7 @@ int main() {
     });
 
     // Simulate some work
-    std::this_thread::sleep_for(std::chrono::seconds(50));
+    std::this_thread::sleep_for(std::chrono::seconds(1000));
 
     client.stop();
     client_thread.join();

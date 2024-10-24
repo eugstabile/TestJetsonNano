@@ -70,6 +70,15 @@ namespace common
             uint32_t height;
     };
 
+    class WholeFrameSize : public FrameSize
+    {
+        public:
+            explicit WholeFrameSize() : FrameSize(4128, 3008)
+            {
+
+            }
+    };
+    
     class FullHdFrameSize : public FrameSize
     {
         public:
