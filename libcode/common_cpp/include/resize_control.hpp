@@ -4,7 +4,7 @@
 
 namespace common 
 {
-    enum ResizeValue { Vga = 0, Hd, FullHd, Whole, None };
+    enum ResizeValue { Vga = 0, Hd, FullHd, None };
 
     class ResizeControl : public IControl {
 

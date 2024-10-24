@@ -70,25 +70,17 @@ void GetFrameEngine::GetFrame(websocketpp::connection_hdl hdl, server::message_p
 
     std::vector<uchar> buf;
     
-    //bool pass = cv::imencode(".png", image.getMat(cv::AccessFlag::ACCESS_READ), buf);
+    bool pass = cv::imencode(".png", image.getMat(cv::AccessFlag::ACCESS_READ), buf);
 
-    const uchar* dataPtr = image.getMat(cv::ACCESS_READ).data;
-    size_t dataSize = image.total() * image.elemSize();
-
-    // Redimensionar el vector para que tenga el tamaño adecuado
-    buf.resize(dataSize);
-
-    // Copiar los datos a std::vector
-    std::copy(dataPtr, dataPtr + dataSize, buf.begin());
-//    if (pass) {
+    if (pass) {
 
         // Send the encoded image
-    server_.send(hdl, buf.data(), buf.size(), websocketpp::frame::opcode::binary);
-    pipeline->ReturnImage();
+        server_.send(hdl, buf.data(), buf.size(), websocketpp::frame::opcode::binary);
+        pipeline->ReturnImage();
 
-    // } else {
-    //     std::cout << "Fail encode" << std::endl;
-    // }
+    } else {
+        std::cout << "Fail encode" << std::endl;
+    }
 
 }
 
@@ -153,4 +145,5 @@ void GetFrameEngine::Stop()
     server_.stop_listening();
     server_.stop();
 }
+
 }
