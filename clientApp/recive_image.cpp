@@ -99,7 +99,7 @@ private:
 
 int main() {
     
-    WebSocketClient client("ws://localhost:9002");
+    WebSocketClient client("ws://10.10.10.183:9002");
     std::thread client_thread([&client]()
      {
         client.run();
