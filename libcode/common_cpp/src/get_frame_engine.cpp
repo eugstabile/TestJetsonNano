@@ -18,25 +18,21 @@ namespace common
 {
 
 
-GetFrameEngine::GetFrameEngine(const ConfiguredCameras &cameras)
-{
+GetFrameEngine::GetFrameEngine(const ConfiguredCameras &cameras) {
     Construct(cameras);
 }
 
-GetFrameEngine::GetFrameEngine(const ConfiguredCamera &camera)
-{
+GetFrameEngine::GetFrameEngine(const ConfiguredCamera &camera) {
     ConfiguredCameras cameras;
     cameras.push_back(camera);
     Construct(cameras);
 }
 
-GetFrameEngine::~GetFrameEngine()
-{
+GetFrameEngine::~GetFrameEngine() {
     Stop();    
 }
 
-void GetFrameEngine::Construct(const ConfiguredCameras &cameras)
-{
+void GetFrameEngine::Construct(const ConfiguredCameras &cameras) {
     if (cameras.empty()) {
         throw std::invalid_argument("Camera list empty"); 
     }
@@ -60,91 +56,86 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras)
  * because OpenCV functions manipulating GUI (imshow, waitKey) must be called from the main thread.
  * This may limit display fps when streaming from multiple sensors.
  */
-void GetFrameEngine::GetFrame(websocketpp::connection_hdl hdl, server::message_ptr msg)
-{  
-    std::cout << msg->get_payload() << std::endl;
+    void GetFrameEngine::GetFrame(websocketpp::connection_hdl hdl, server::message_ptr msg) {  
+        std::cout << msg->get_payload() << std::endl;
 
-    auto&& pipeline = imagePipelines.front();
+        auto&& pipeline = imagePipelines.front();
 
-    cv::UMat image = pipeline->GetImage();
-    
-    int type = image.type();
-    std::string typeStr = cv::typeToString(type);
-    std::cout << "Tipo de datos de la UMat: " << typeStr << std::endl;
+        cv::UMat image = pipeline->GetImage();
 
-    std::vector<uchar> buf(image.total() * image.elemSize());
-    std::cout << "Primeros valores de la imagen RAW10: ";
-    std::memcpy(buf.data(), image.getMat(cv::AccessFlag::ACCESS_READ).data, buf.size());
-    for (int i = 0; i < 10; ++i) {
-        std::cout << static_cast<int>(buf[i]) << " ";
+        
+        std::vector<ushort> buf(image.total() * image.elemSize());
+        std::memcpy(buf.data(), image.getMat(cv::AccessFlag::ACCESS_READ).data, buf.size());
+
+        for(int i = 0; i < 10; ++i){
+            std::cout << buf[i] << " ";
+        }
+
+        // Send the encoded image
+        server_.send(hdl, buf.data(), buf.size(), websocketpp::frame::opcode::binary);
+        pipeline->ReturnImage();
+
     }
-
-    // Send the encoded image
-    server_.send(hdl, buf.data(), buf.size(), websocketpp::frame::opcode::binary);
-    pipeline->ReturnImage();
-
-}
 
 /**
  * Sensors in master mode have to be started before sensors in slave mode that they control.
  * Application may hang otherwise.
  */
-void GetFrameEngine::Start()
-{
-    std::for_each(imagePipelines.begin(), imagePipelines.end(), 
-        [](std::unique_ptr<ImagePipeline> &pipeline) { 
-            if (pipeline->IsMaster()) pipeline->Start(); 
-        }
-    );
+void GetFrameEngine::Start() {
 
-    std::for_each(imagePipelines.begin(), imagePipelines.end(),
-        [](std::unique_ptr<ImagePipeline> &pipeline) {
-            if (!pipeline->IsMaster()) pipeline->Start();
-        }
-    );
+        std::for_each(imagePipelines.begin(), imagePipelines.end(), 
+            [](std::unique_ptr<ImagePipeline> &pipeline) { 
+                if (pipeline->IsMaster()) pipeline->Start(); 
+            }
+        );
 
-    try {
+        std::for_each(imagePipelines.begin(), imagePipelines.end(),
+            [](std::unique_ptr<ImagePipeline> &pipeline) {
+                if (!pipeline->IsMaster()) pipeline->Start();
+            }
+        );
 
-        server_.set_access_channels(websocketpp::log::alevel::all);
-        server_.clear_access_channels(websocketpp::log::alevel::frame_payload);
+        try {
 
-        server_.init_asio();
+            server_.set_access_channels(websocketpp::log::alevel::all);
+            server_.clear_access_channels(websocketpp::log::alevel::frame_payload);
 
-        server_.set_message_handler([this](websocketpp::connection_hdl hdl, server::message_ptr msg) {
-            this->GetFrame(hdl, msg);
-        });
+            server_.init_asio();
+
+            server_.set_message_handler([this](websocketpp::connection_hdl hdl, server::message_ptr msg) {
+                this->GetFrame(hdl, msg);
+            });
+                
+            server_.listen(9002);
+            server_.start_accept();
+            server_.run();
             
-        server_.listen(9002);
-        server_.start_accept();
-        server_.run();
-        
-    } catch (websocketpp::exception const & e) {
-        std::cout << e.what() << std::endl;
-    } catch (...) {
-        std::cout << "other exception" << std::endl;
+        } catch (websocketpp::exception const & e) {
+            std::cout << e.what() << std::endl;
+        } catch (...) {
+            std::cout << "other exception" << std::endl;
+        }
     }
-}
 
-/**
- * Sensors in master mode have to be stopped after sensors in slave mode that they control.
- * Application may hang otherwise.
- */
-void GetFrameEngine::Stop()
-{
-    std::for_each(imagePipelines.begin(), imagePipelines.end(),
-        [](std::unique_ptr<ImagePipeline> &pipeline) {
-            if (!pipeline->IsMaster()) pipeline->Stop();
-        }
-    );
+    /**
+     * Sensors in master mode have to be stopped after sensors in slave mode that they control.
+     * Application may hang otherwise.
+     */
+    void GetFrameEngine::Stop() {
+        std::for_each(imagePipelines.begin(), imagePipelines.end(),
+            [](std::unique_ptr<ImagePipeline> &pipeline) {
+                if (!pipeline->IsMaster()) pipeline->Stop();
+            }
+        );
 
-    std::for_each(imagePipelines.begin(), imagePipelines.end(), 
-        [](std::unique_ptr<ImagePipeline> &pipeline) { 
-            if (pipeline->IsMaster()) pipeline->Stop(); 
-        }
-    );
+        std::for_each(imagePipelines.begin(), imagePipelines.end(), 
+            [](std::unique_ptr<ImagePipeline> &pipeline) { 
+                if (pipeline->IsMaster()) pipeline->Stop(); 
+            }
+        );
 
-    server_.stop_listening();
-    server_.stop();
-}
+        server_.stop_listening();
+        server_.stop();
+    }
 
 }
