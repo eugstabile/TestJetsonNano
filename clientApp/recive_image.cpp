@@ -71,19 +71,26 @@ private:
     websocketpp::connection_hdl connection_hdl_;
 
     void on_message(client* c, websocketpp::connection_hdl hdl, client::message_ptr msg) {
+
         // Decode the received image
+        std::vector<uchar> buf(msg->get_payload().begin(), msg->get_payload().end());
+
+         std::cout << "Primeros valores de la imagen RAW10: ";
+        for (int i = 0; i < 10; ++i) {
+            std::cout << static_cast<int>(buf[i]) << " ";
+        }
+    
+        cv::Mat image(720, 1280, CV_16UC1, buf.data());
         
-        const std::string &data = msg->get_payload();
+        cv::Mat image8bit;
+        cv::normalize(image, image8bit, 0, 255, cv::NORM_MINMAX, CV_8UC1);
 
-        std::vector<uchar> buf(data.begin(), data.end());
 
-        cv::Mat image = cv::imdecode(buf, cv::IMREAD_GRAYSCALE);
-
-        if (image.empty()) {
+        if (image8bit.empty()) {
             std::cout << "Image empty." << std::endl;
         } else {
             // Display the image
-            cv::imshow("Received Image", image);
+            cv::imshow("Received Image", image8bit);
             cv::waitKey(1);
         }
 
@@ -98,8 +105,10 @@ private:
 };
 
 int main() {
-    
-    WebSocketClient client("ws://10.10.10.183:9002");
+
+    const std::string IP_SERVER = "192.168.1.229";
+    std::string ip = "ws://" + IP_SERVER +  ":9002";
+    WebSocketClient client(ip);
     std::thread client_thread([&client]()
      {
         client.run();
@@ -110,5 +119,7 @@ int main() {
 
     client.stop();
     client_thread.join();
+    
     return 0;
+
 }

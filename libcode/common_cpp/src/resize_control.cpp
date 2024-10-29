@@ -47,7 +47,8 @@ bool ResizeControl::Set(int32_t val)
         return false;
     }
     value = val;
-    return true;
+    return false;
+    //return true;
 }
 
 int32_t ResizeControl::GetMinValue()

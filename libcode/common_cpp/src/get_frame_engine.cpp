@@ -67,20 +67,21 @@ void GetFrameEngine::GetFrame(websocketpp::connection_hdl hdl, server::message_p
     auto&& pipeline = imagePipelines.front();
 
     cv::UMat image = pipeline->GetImage();
-
-    std::vector<uchar> buf;
     
-    bool pass = cv::imencode(".png", image.getMat(cv::AccessFlag::ACCESS_READ), buf);
+    int type = image.type();
+    std::string typeStr = cv::typeToString(type);
+    std::cout << "Tipo de datos de la UMat: " << typeStr << std::endl;
 
-    if (pass) {
-
-        // Send the encoded image
-        server_.send(hdl, buf.data(), buf.size(), websocketpp::frame::opcode::binary);
-        pipeline->ReturnImage();
-
-    } else {
-        std::cout << "Fail encode" << std::endl;
+    std::vector<uchar> buf(image.total() * image.elemSize());
+    std::cout << "Primeros valores de la imagen RAW10: ";
+    std::memcpy(buf.data(), image.getMat(cv::AccessFlag::ACCESS_READ).data, buf.size());
+    for (int i = 0; i < 10; ++i) {
+        std::cout << static_cast<int>(buf[i]) << " ";
     }
+
+    // Send the encoded image
+    server_.send(hdl, buf.data(), buf.size(), websocketpp::frame::opcode::binary);
+    pipeline->ReturnImage();
 
 }
 
