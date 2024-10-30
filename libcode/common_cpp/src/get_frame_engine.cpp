@@ -67,7 +67,7 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras) {
         //std::memcpy(buf.data(), image.getMat(cv::AccessFlag::ACCESS_READ).data, buf.size() * image.);
 
         // Send the encoded image
-        server_.send(hdl, image.data(), image.total() * image.elementSize(), websocketpp::frame::opcode::binary);
+        server_.send(hdl, image.getMat(cv::AccessFlag::ACCESS_READ).data, image.total() * image.elemSize(), websocketpp::frame::opcode::binary);
         pipeline->ReturnImage();
 
     }
