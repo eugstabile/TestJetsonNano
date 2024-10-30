@@ -65,7 +65,7 @@ void DisplayEngine::ConstructHotkeyActions()
     hotkeyActions.emplace_back(HotkeyAction(
         {'f', 'F'},
         "Toggle FPS counter",
-        [this](){ toggleFps = true; }
+        [this](){ toggleFps = false; }
     ));
 
     hotkeyActions.emplace_back(HotkeyAction(

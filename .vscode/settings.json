@@ -111,7 +111,8 @@
         "syncstream": "cpp",
         "unordered_set": "cpp",
         "variant": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "xxatomic": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

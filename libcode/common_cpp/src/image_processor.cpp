@@ -49,7 +49,7 @@ void ImageProcessor::ToggleCrosshair()
 
 void ImageProcessor::ToggleShowFps()
 {
-    showFps = !showFps;
+    showFps = 0;
 }
 
 void ImageProcessor::SetFps(uint32_t acquisitionFps, uint32_t displayFps)
