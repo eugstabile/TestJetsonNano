@@ -65,33 +65,37 @@ public:
     }
 
 private:
+
     typedef websocketpp::client<websocketpp::config::asio_client> client;
     client client_;
     std::string uri_;
     websocketpp::connection_hdl connection_hdl_;
 
     void on_message(client* c, websocketpp::connection_hdl hdl, client::message_ptr msg) {
-
-        // Decode the received image
-        std::vector<uchar> buf(msg->get_payload().begin(), msg->get_payload().end());
-
-         std::cout << "Primeros valores de la imagen RAW10: ";
-        for (int i = 0; i < 10; ++i) {
-            std::cout << static_cast<int>(buf[i]) << " ";
-        }
-    
-        cv::Mat image(720, 1280, CV_16UC1, buf.data());
         
-        cv::Mat image8bit;
-        cv::normalize(image, image8bit, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+        std::vector<uint8_t> buf(msg->get_payload().begin(), msg->get_payload().end());
 
+        cv::Mat image(720, 1280, CV_16UC1, msg->get_payload().);
 
-        if (image8bit.empty()) {
+        //cv::Mat image8bit;
+        //cv::normalize(image, image8bit, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+
+        if (image.empty()) {
             std::cout << "Image empty." << std::endl;
         } else {
             // Display the image
-            cv::imshow("Received Image", image8bit);
+            cv::imshow("Received Image", image);
+            cv::imwrite("image.tiff", image);
             cv::waitKey(1);
+            
+            // std::ofstream archivo("image.txt");
+            // for(int i = 0; i < 720; ++i) {
+            //     for(int j = 0; j < 1280; ++j) {
+            //         std::cout << buf[];
+            //     }
+            //     std::cout << std::endl;
+            // }
+            
         }
 
         send();
@@ -105,7 +109,7 @@ private:
 };
 
 int main() {
-
+    
     const std::string IP_SERVER = "192.168.1.229";
     std::string ip = "ws://" + IP_SERVER +  ":9002";
     WebSocketClient client(ip);
@@ -115,7 +119,7 @@ int main() {
     });
 
     // Simulate some work
-    std::this_thread::sleep_for(std::chrono::seconds(1000));
+    std::this_thread::sleep_for(std::chrono::seconds(20));
 
     client.stop();
     client_thread.join();
