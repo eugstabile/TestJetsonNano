@@ -73,19 +73,19 @@ private:
 
     void on_message(client* c, websocketpp::connection_hdl hdl, client::message_ptr msg) {
         
-        std::vector<ushort> buf(msg->get_payload().begin(), msg->get_payload().end());
+        std::vector<uint8_t> buf(msg->get_payload().begin(), msg->get_payload().end());
 
-        cv::Mat image(720, 1280, CV_16UC1, buf.data());
+        cv::Mat image(720, 1280, CV_16UC1, msg->get_payload().);
 
-        cv::Mat image8bit;
-        cv::normalize(image, image8bit, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+        //cv::Mat image8bit;
+        //cv::normalize(image, image8bit, 0, 255, cv::NORM_MINMAX, CV_8UC1);
 
-        if (image8bit.empty()) {
+        if (image.empty()) {
             std::cout << "Image empty." << std::endl;
         } else {
             // Display the image
-            cv::imshow("Received Image", image8bit);
-            cv::imwrite("image.tiff", image8bit);
+            cv::imshow("Received Image", image);
+            cv::imwrite("image.tiff", image);
             cv::waitKey(1);
             
             // std::ofstream archivo("image.txt");

@@ -36,10 +36,10 @@ namespace common
 
     Selection SelectValue(int32_t min, int32_t max, int32_t &index, bool clamp = false)
     {
-        std::cout << ">" << std::flush;
+        //std::cout << ">" << std::flush;
 
         std::string selection;
-        std::getline(std::cin, selection);
+        //std::getline(std::cin, selection);
 
         if (selection == exitMenuKey || selection.empty()) {
             return Selection::Exit;

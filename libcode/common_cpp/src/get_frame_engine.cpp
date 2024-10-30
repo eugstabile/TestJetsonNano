@@ -63,16 +63,11 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras) {
 
         cv::UMat image = pipeline->GetImage();
 
-        
-        std::vector<ushort> buf(image.total() * image.elemSize());
-        std::memcpy(buf.data(), image.getMat(cv::AccessFlag::ACCESS_READ).data, buf.size());
-
-        for(int i = 0; i < 10; ++i){
-            std::cout << buf[i] << " ";
-        }
+        //std::vector<uint16_t> buf(image.total() );
+        //std::memcpy(buf.data(), image.getMat(cv::AccessFlag::ACCESS_READ).data, buf.size() * image.);
 
         // Send the encoded image
-        server_.send(hdl, buf.data(), buf.size(), websocketpp::frame::opcode::binary);
+        server_.send(hdl, image.data(), image.total() * image.elementSize(), websocketpp::frame::opcode::binary);
         pipeline->ReturnImage();
 
     }

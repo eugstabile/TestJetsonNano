@@ -12,12 +12,12 @@ int32_t QueryNumber(int32_t minInclusive, int32_t maxInclusive, int32_t defaultV
     int32_t selectedNumber = defaultValue;
     bool validNumber = false;
     do {
-        std::cout << ">";
+        //std::cout << ">";
 
         std::string selection;
-        std::getline(std::cin, selection);
+        //std::getline(std::cin, selection);
 
-        if (selection == "") {
+        if (selection.empty()) {
             return defaultValue;
         }
         return defaultValue;
