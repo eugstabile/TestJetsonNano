@@ -61,9 +61,9 @@ public:
         client_.send(connection_hdl_, mensaje, websocketpp::frame::opcode::text, ec);
 
         if (ec) {
-
-            std::cout << "Echo failed because: " << ec.message() << std:: endl;
-
+            std::cout << "CLIENT: Echo failed because: " << ec.message() << std:: endl;
+        } else {
+            std::cout << "CLIENT: sendddd: " << ec.message() << std:: endl;
         }
         
     }
@@ -82,6 +82,9 @@ private:
         size_t length = buf.size();
         void* data = static_cast<void*>(buf.data());
         std::string file = "frame.raw";
+
+        // Borrar el archivo anterior si existe
+        DeleteFile(file.c_str());
 
         // Crear y abrir el archivo
         HANDLE hFile = CreateFile(file.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -122,7 +125,7 @@ int main() {
     });
 
     // Simulate some work
-    //std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(100));
 
     client.stop();
     client_thread.join();

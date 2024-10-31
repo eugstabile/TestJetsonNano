@@ -56,34 +56,38 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras) {
 
         auto&& pipeline = imagePipelines.front();
         IImage image = pipeline->GetRawImage();
-            switch (image.pixelFormat) {
-        case V4L2_PIX_FMT_SBGGR8:
-        case V4L2_PIX_FMT_SGBRG8:
-        case V4L2_PIX_FMT_SGRBG8:
-        case V4L2_PIX_FMT_SRGGB8:
-            std::cout << "8" << std::endl;
-            break;
-        case V4L2_PIX_FMT_SBGGR10:
-        case V4L2_PIX_FMT_SBGGR10P:
-        case V4L2_PIX_FMT_SGBRG10:
-        case V4L2_PIX_FMT_SGBRG10P:
-        case V4L2_PIX_FMT_SGRBG10:
-        case V4L2_PIX_FMT_SGRBG10P:
-        case V4L2_PIX_FMT_SRGGB10:
-        case V4L2_PIX_FMT_SRGGB10P:
-            std::cout << "10" << std::endl;
-            break;
-        case V4L2_PIX_FMT_SBGGR12:
-        case V4L2_PIX_FMT_SBGGR12P:
-        case V4L2_PIX_FMT_SGBRG12:
-        case V4L2_PIX_FMT_SGBRG12P:
-        case V4L2_PIX_FMT_SGRBG12:
-        case V4L2_PIX_FMT_SGRBG12P:
-        case V4L2_PIX_FMT_SRGGB12:
-        case V4L2_PIX_FMT_SRGGB12P:
-            std::cout << "12" << std::endl;
-            break;
+            
+        std::cout << "pasando pipe" << std::endl;
+
+        switch (image.pixelFormat) {
+            case V4L2_PIX_FMT_SBGGR8:
+            case V4L2_PIX_FMT_SGBRG8:
+            case V4L2_PIX_FMT_SGRBG8:
+            case V4L2_PIX_FMT_SRGGB8:
+                std::cout << "8" << std::endl;
+                break;
+            case V4L2_PIX_FMT_SBGGR10:
+            case V4L2_PIX_FMT_SBGGR10P:
+            case V4L2_PIX_FMT_SGBRG10:
+            case V4L2_PIX_FMT_SGBRG10P:
+            case V4L2_PIX_FMT_SGRBG10:
+            case V4L2_PIX_FMT_SGRBG10P:
+            case V4L2_PIX_FMT_SRGGB10:
+            case V4L2_PIX_FMT_SRGGB10P:
+                std::cout << "10" << std::endl;
+                break;
+            case V4L2_PIX_FMT_SBGGR12:
+            case V4L2_PIX_FMT_SBGGR12P:
+            case V4L2_PIX_FMT_SGBRG12:
+            case V4L2_PIX_FMT_SGBRG12P:
+            case V4L2_PIX_FMT_SGRBG12:
+            case V4L2_PIX_FMT_SGRBG12P:
+            case V4L2_PIX_FMT_SRGGB12:
+            case V4L2_PIX_FMT_SRGGB12P:
+                std::cout << "12" << std::endl;
+                break;
         }
+
         std::cout << "pixelFormat: " << image.pixelFormat << std::endl;
         std::cout << "Length: " << image.length << std::endl;
         std::cout << "width: " << image.width << std::endl;
@@ -91,7 +95,15 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras) {
         std::cout << "stride: " << image.stride << std::endl;
 
         // Send the encoded image
-        server_.send(hdl, image.data, image.length, websocketpp::frame::opcode::binary);
+        websocketpp::lib::error_code ec;
+        server_.send(hdl, image.data, image.length, websocketpp::frame::opcode::binary, ec);
+
+        if (ec) {
+            std::cout << "SERVER: Echo failed because: " << ec.message() << std:: endl;
+        } else {
+            std::cout << "SERVER: sendddd: " << ec.message() << std:: endl;
+        }
+        
         pipeline->ReturnImage();
 
     }

@@ -26,12 +26,12 @@ namespace common
             return;
         }
 
-        std::cout << "Choose a pixel format [0]\n";
-        for (const MenuEntry& entry : menu) {
-            std::cout << entry.index  << " - " << entry.name << std::endl;
-        }
+        // std::cout << "Choose a pixel format [0]\n";
+        // for (const MenuEntry& entry : menu) {
+        //     std::cout << entry.index  << " - " << entry.name << std::endl;
+        // }
 
-        int32_t index = QueryNumber(0, menu.size() - 1, 0);
+        int32_t index = 1; //QueryNumber(0, menu.size() - 1, 0);
         control->Set(index);
 
         if (control->Get() != index) {

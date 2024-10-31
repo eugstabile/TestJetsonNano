@@ -36,10 +36,10 @@ namespace common
 
     Selection SelectValue(int32_t min, int32_t max, int32_t &index, bool clamp = false)
     {
-        std::cout << ">" << std::flush;
+        //std::cout << ">" << std::flush;
 
         std::string selection;
-        std::getline(std::cin, selection);
+        //std::getline(std::cin, selection);
 
         if (selection == exitMenuKey || selection.empty()) {
             return Selection::Exit;
@@ -72,27 +72,27 @@ namespace common
     bool GetMenuEntry(std::string prompt, std::vector<DisplayMenuEntry<TValue>> menu, TValue &selected)
     {
         ClearTerminal();
+        return false;
+        //std::cout << prompt << " [" << exitMenuKey << "]:" << std::endl;
 
-        std::cout << prompt << " [" << exitMenuKey << "]:" << std::endl;
+        // for (uint32_t i = 0; i < menu.size(); ++i) {
+        //     std::cout << i << " - " << menu[i].GetDescription() << std::endl;
+        // }
 
-        for (uint32_t i = 0; i < menu.size(); ++i) {
-            std::cout << i << " - " << menu[i].GetDescription() << std::endl;
-        }
-
-        while (true) {
-            int32_t index;
-            switch (SelectValue(0, menu.size() - 1, index)) {
-            case Selection::Selected:
-                selected = menu[index].GetValue();
-                //std::cout << std::endl;
-                return true;
-            case Selection::Exit:
-                //std::cout << std::endl;
-                return false;
-            case Selection::Repeat:
-                break;
-            }
-        }
+        // while (true) {
+        //     int32_t index;
+        //     switch (SelectValue(0, menu.size() - 1, index)) {
+        //     case Selection::Selected:
+        //         selected = menu[index].GetValue();
+        //         //std::cout << std::endl;
+        //         return true;
+        //     case Selection::Exit:
+        //         //std::cout << std::endl;
+        //         return false;
+        //     case Selection::Repeat:
+        //         break;
+        //     }
+        // }
     }
 
     int32_t GetInteger(std::string prompt, int32_t min, int32_t max, int32_t step, int32_t defaultValue, int32_t &selected)

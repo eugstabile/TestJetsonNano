@@ -22,7 +22,7 @@ namespace common
 #endif
 
 ImageProcessor::ImageProcessor(uint32_t pixelFormat) 
-: debayer(false), resizeOptions({}), showCrosshair(false), showFps(true), acquisitionFps(0), displayFps(0), pixelFormat(pixelFormat)
+: debayer(false), resizeOptions({}), showCrosshair(false), showFps(false), acquisitionFps(0), displayFps(0), pixelFormat(pixelFormat)
 {
 
 }
@@ -60,7 +60,7 @@ void ImageProcessor::SetFps(uint32_t acquisitionFps, uint32_t displayFps)
 
 void ImageProcessor::SetPixelFormat(uint32_t pixelFormat)
 {
-    pixelFormat = pixelFormat;
+    pixelFormat = 10;
 }
 
 void ImageProcessor::ProcessImage(const IProcessedImage &input, cv::UMat &output)
