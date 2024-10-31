@@ -15,7 +15,7 @@
 namespace common
 {
     typedef websocketpp::server<websocketpp::config::asio> server;
-    class ImagePipeline;
+    class SequentialImagePipeline;
 
     class GetFrameEngine
     {        
@@ -38,7 +38,7 @@ namespace common
 
             ResizeOptions resizeOptions;
             
-            std::vector<std::unique_ptr<ImagePipeline>> imagePipelines;
+            std::vector<std::unique_ptr<SequentialImagePipeline>> imagePipelines;
 
             void Construct(const ConfiguredCameras &cameras);
     };

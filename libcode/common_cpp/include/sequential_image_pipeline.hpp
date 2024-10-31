@@ -50,6 +50,15 @@ namespace common
                 return image;
             }
 
+            IImage GetRawImage()
+            {
+                auto rawImage = captureNode->GetOutputBlocking();
+                while (rawImage.data == nullptr)
+                    rawImage = captureNode->GetOutputBlocking();
+
+                return rawImage;
+            }
+
             void ReturnImage() override
             {
                 fpsMeasurer.FrameReceived();

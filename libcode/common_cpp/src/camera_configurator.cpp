@@ -26,8 +26,17 @@ ConfiguredCameras CameraConfigurator::Configure()
     ConfiguredCameras configuredCameras;
 
     std::transform(cameras.begin(), cameras.end(), std::back_inserter(configuredCameras),
-        [](ICamera *camera) { return ConfiguredCamera {camera, false, { true, HdFrameSize().GetWidth(), HdFrameSize().GetHeight() }}; }
+        [](ICamera *camera) {
+
+           
+
+            
+             return ConfiguredCamera {camera, false, { false, WholeFrameSize().GetWidth(), WholeFrameSize().GetHeight() }};
+             
+             
+     }
     );
+
 
     int32_t index;
     while (GetConfigurationMenuEntry(index))

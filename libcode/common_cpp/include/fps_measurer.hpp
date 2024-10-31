@@ -11,7 +11,7 @@ namespace common
 
             FpsMeasurer() : frameCounter(0), fps(0)
             {
-                fpsThreadActive = true;
+                fpsThreadActive = false;
                 fpsThread = std::thread(&FpsMeasurer::FpsThread, this);
             }
 

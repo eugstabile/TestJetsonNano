@@ -36,10 +36,10 @@ namespace common
 
     Selection SelectValue(int32_t min, int32_t max, int32_t &index, bool clamp = false)
     {
-        //std::cout << ">" << std::flush;
+        std::cout << ">" << std::flush;
 
         std::string selection;
-        //std::getline(std::cin, selection);
+        std::getline(std::cin, selection);
 
         if (selection == exitMenuKey || selection.empty()) {
             return Selection::Exit;
@@ -73,11 +73,11 @@ namespace common
     {
         ClearTerminal();
 
-        //std::cout << prompt << " [" << exitMenuKey << "]:" << std::endl;
+        std::cout << prompt << " [" << exitMenuKey << "]:" << std::endl;
 
-        //for (uint32_t i = 0; i < menu.size(); ++i) {
-            //std::cout << i << " - " << menu[i].GetDescription() << std::endl;
-        //}
+        for (uint32_t i = 0; i < menu.size(); ++i) {
+            std::cout << i << " - " << menu[i].GetDescription() << std::endl;
+        }
 
         while (true) {
             int32_t index;

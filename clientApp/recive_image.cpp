@@ -2,11 +2,16 @@
 #include <websocketpp/client.hpp>
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <fstream>
 #include <vector>
+#include <direct.h>  
+#include <windows.h>
 
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
+
+void SaveFrame(void *data, uint32_t length, std::string file);
 
 class WebSocketClient {
 public:
@@ -40,7 +45,6 @@ public:
         client_.connect(con);
         connection_hdl_ = con->get_handle();
 
-        cv::namedWindow("Received Image", cv::WINDOW_AUTOSIZE);
         client_.run();
 
     }
@@ -75,29 +79,28 @@ private:
         
         std::vector<uchar> buf(msg->get_payload().begin(), msg->get_payload().end());
 
-        cv::Mat image(720, 1280, CV_16UC1, buf.data());
+        size_t length = buf.size();
+        void* data = static_cast<void*>(buf.data());
+        std::string file = "frame.raw";
 
-        //cv::Mat image8bit;
-        //cv::normalize(image, image8bit, 0, 255, cv::NORM_MINMAX, CV_8UC1);
-
-        if (image.empty()) {
-            std::cout << "Image empty." << std::endl;
-        } else {
-            // Display the image
-            cv::imshow("Received Image", image);
-            cv::imwrite("image.tiff", image);
-            cv::waitKey(1);
-            
-            // std::ofstream archivo("image.txt");
-            // for(int i = 0; i < 720; ++i) {
-            //     for(int j = 0; j < 1280; ++j) {
-            //         std::cout << buf[];
-            //     }
-            //     std::cout << std::endl;
-            // }
-            
+        // Crear y abrir el archivo
+        HANDLE hFile = CreateFile(file.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (hFile == INVALID_HANDLE_VALUE) {
+            std::cerr << "Unable to save frame, cannot open file " << file << std::endl;
+            return;
+        }
+        
+        // Escribir los datos en el archivo
+        DWORD writtenBytes;
+        BOOL result = WriteFile(hFile, data, length, &writtenBytes, NULL);
+        if (!result) {
+            std::cerr << "Error writing to file " << file << std::endl;
+        } else if (writtenBytes != length) {
+            std::cerr << "Warning: " << writtenBytes << " out of " << length << " were written to file " << file << std::endl;
         }
 
+        // Cerrar el archivo
+        CloseHandle(hFile);
         send();
 
     }
@@ -119,7 +122,7 @@ int main() {
     });
 
     // Simulate some work
-    std::this_thread::sleep_for(std::chrono::seconds(20));
+    //std::this_thread::sleep_for(std::chrono::seconds(1));
 
     client.stop();
     client_thread.join();

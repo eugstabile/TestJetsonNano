@@ -2,8 +2,7 @@
 
 #include "hotkey_action.hpp"
 #include "sequential_image_pipeline.hpp"
-#include "parallel_image_pipeline.hpp"
-
+#include <linux/videodev2.h>
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
@@ -40,11 +39,7 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras) {
     resizeOptions = {};
 
     for (auto camera : cameras) {
-        if (sv::GetPlatform() == SV_PLATFORM_DRAGONBOARD_410C)
-            imagePipelines.push_back(std::unique_ptr<ImagePipeline>(new SequentialImagePipeline(camera.camera)));
-        else
-            imagePipelines.push_back(std::unique_ptr<ImagePipeline>(new ParallelImagePipeline(camera.camera)));
-        
+        imagePipelines.push_back(std::unique_ptr<SequentialImagePipeline>(new SequentialImagePipeline(camera.camera)));
         imagePipelines.back()->SetDebayer(camera.debayering);
         imagePipelines.back()->SetResizeOptions(camera.resizeOptions);
     }
@@ -60,14 +55,43 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras) {
         std::cout << msg->get_payload() << std::endl;
 
         auto&& pipeline = imagePipelines.front();
-
-        cv::UMat image = pipeline->GetImage();
-
-        //std::vector<uint16_t> buf(image.total() );
-        //std::memcpy(buf.data(), image.getMat(cv::AccessFlag::ACCESS_READ).data, buf.size() * image.);
+        IImage image = pipeline->GetRawImage();
+            switch (image.pixelFormat) {
+        case V4L2_PIX_FMT_SBGGR8:
+        case V4L2_PIX_FMT_SGBRG8:
+        case V4L2_PIX_FMT_SGRBG8:
+        case V4L2_PIX_FMT_SRGGB8:
+            std::cout << "8" << std::endl;
+            break;
+        case V4L2_PIX_FMT_SBGGR10:
+        case V4L2_PIX_FMT_SBGGR10P:
+        case V4L2_PIX_FMT_SGBRG10:
+        case V4L2_PIX_FMT_SGBRG10P:
+        case V4L2_PIX_FMT_SGRBG10:
+        case V4L2_PIX_FMT_SGRBG10P:
+        case V4L2_PIX_FMT_SRGGB10:
+        case V4L2_PIX_FMT_SRGGB10P:
+            std::cout << "10" << std::endl;
+            break;
+        case V4L2_PIX_FMT_SBGGR12:
+        case V4L2_PIX_FMT_SBGGR12P:
+        case V4L2_PIX_FMT_SGBRG12:
+        case V4L2_PIX_FMT_SGBRG12P:
+        case V4L2_PIX_FMT_SGRBG12:
+        case V4L2_PIX_FMT_SGRBG12P:
+        case V4L2_PIX_FMT_SRGGB12:
+        case V4L2_PIX_FMT_SRGGB12P:
+            std::cout << "12" << std::endl;
+            break;
+        }
+        std::cout << "pixelFormat: " << image.pixelFormat << std::endl;
+        std::cout << "Length: " << image.length << std::endl;
+        std::cout << "width: " << image.width << std::endl;
+        std::cout << "height: " << image.height << std::endl;
+        std::cout << "stride: " << image.stride << std::endl;
 
         // Send the encoded image
-        server_.send(hdl, image.getMat(cv::AccessFlag::ACCESS_READ).data, image.total() * image.elemSize(), websocketpp::frame::opcode::binary);
+        server_.send(hdl, image.data, image.length, websocketpp::frame::opcode::binary);
         pipeline->ReturnImage();
 
     }
@@ -79,13 +103,13 @@ void GetFrameEngine::Construct(const ConfiguredCameras &cameras) {
 void GetFrameEngine::Start() {
 
         std::for_each(imagePipelines.begin(), imagePipelines.end(), 
-            [](std::unique_ptr<ImagePipeline> &pipeline) { 
+            [](std::unique_ptr<SequentialImagePipeline> &pipeline) { 
                 if (pipeline->IsMaster()) pipeline->Start(); 
             }
         );
 
         std::for_each(imagePipelines.begin(), imagePipelines.end(),
-            [](std::unique_ptr<ImagePipeline> &pipeline) {
+            [](std::unique_ptr<SequentialImagePipeline> &pipeline) {
                 if (!pipeline->IsMaster()) pipeline->Start();
             }
         );
@@ -118,13 +142,13 @@ void GetFrameEngine::Start() {
      */
     void GetFrameEngine::Stop() {
         std::for_each(imagePipelines.begin(), imagePipelines.end(),
-            [](std::unique_ptr<ImagePipeline> &pipeline) {
+            [](std::unique_ptr<SequentialImagePipeline> &pipeline) {
                 if (!pipeline->IsMaster()) pipeline->Stop();
             }
         );
 
         std::for_each(imagePipelines.begin(), imagePipelines.end(), 
-            [](std::unique_ptr<ImagePipeline> &pipeline) { 
+            [](std::unique_ptr<SequentialImagePipeline> &pipeline) { 
                 if (pipeline->IsMaster()) pipeline->Stop(); 
             }
         );

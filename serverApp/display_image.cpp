@@ -16,10 +16,19 @@ int main()
 
     auto selected = common::SelectMultipleCameras(cameras);
 
+    IControl *control = selected[0]->GetControl(SV_V4L2_IMAGEFORMAT);
+    
+    if (control) {
+        common::SelectPixelFormat(control);
+    }
     common::ConfiguredCameras configuredCameras = common::CameraConfigurator(selected).Configure();
 
+    
+    
     common::GetFrameEngine frameEngine(configuredCameras);
     
+
+
     frameEngine.Start();
 
     return 0;
